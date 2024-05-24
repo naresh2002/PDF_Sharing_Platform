@@ -2,7 +2,7 @@
 ShareDocs a PDF Management &amp; Collaboration System
 
 
-.env
+# .env
 SECRET_KEY={{SECRET_KEY}}
 DATABASE_NAME={{DATABASE_NAME}}
 DATABASE_USER={{postgres}}
