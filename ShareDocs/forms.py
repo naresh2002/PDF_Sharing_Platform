@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, UploadedFile, Comment
+from .models import User, File, Comment
 from django.contrib.auth.hashers import make_password
 
 class SignUpForm(forms.ModelForm):
@@ -34,10 +34,10 @@ class LoginForm(forms.Form):
 
 class UploadedFileForm(forms.ModelForm):
     class Meta:
-        model = UploadedFile
-        fields = ['file']
+        model = File
+        fields = ['name']
     
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text']
+        fields = ['comment_text']

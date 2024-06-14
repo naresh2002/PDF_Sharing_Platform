@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h2>Welcome Home!</h2>
+    {% if user %}
+        <p>Welcome, {{ user.username }}!</p>
+        <p>Email: {{ user.email }}</p>
+        <!-- Add more user details here if needed -->
+    {% else %}
+        <p>{{ error }}</p>
+    {% endif %}
+    <!-- Add your content here -->
+</body>
+</html>

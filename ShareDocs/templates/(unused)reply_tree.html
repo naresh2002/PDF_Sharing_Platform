@@ -1,0 +1,15 @@
+<!-- reply_tree.html -->
+{% for reply in replies %}
+    <div class="reply-container">
+        <p><strong>{{ reply.user_name }}</strong>: {{ reply.text }}</p>
+        <button class="toggle-reply-form" data-comment="{{ reply.id }}">Reply</button>
+        <div id="reply_form_{{ reply.id }}" class="reply-form" style="display: none;">
+            <form method="post" action="{% url 'add_reply' reply.id %}" class="comment-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="reply-button">Submit Reply</button>
+            </form>
+        </div>
+        {% include 'reply_tree.html' with replies=reply.replies %}
+    </div>
+{% endfor %}

@@ -1,19 +1,25 @@
 from django.urls import path
-from . import views
+from . import views, api
 
 urlpatterns = [
-    path('upload/', views.upload_file, name='upload_file'),
-    path('file_uploaded/', views.file_uploaded, name='file_uploaded'),
+    # HOME
+    path('', views.all_files, name='all_files'),
+
+    # LOGIN & SIGNUP
+    path('login/', views.login, name='login'),
+    path('signup/', views.signup, name='signup'),
     path('logout/', views.logout, name='logout'),
 
-    path('add_comment/<int:file_id>/', views.add_comment, name='add_comment'),
-    path('add_reply/<int:file_id>/<int:parent_id>/', views.add_reply, name='add_reply'),
+    # FILE UPLOAD
+    path('upload/', views.upload_file, name='upload_file'),
+    path('file_uploaded/', views.file_uploaded, name='file_uploaded'),
 
+    # COMMENTS & REPLIES
+    path('add_comment/<uuid:file_id>/', views.add_comment, name='add_comment'),
+    path('add_reply/<uuid:file_id>/<uuid:parent_id>/', views.add_reply, name='add_reply'),
+
+    # OTHERS
     path('check_user_data/', views.check_user_data, name='check_user_data'),
+    path('api/user/<str:username>/', api.get_user_data, name='api_get_user_data'),
 
-    # path('add_comment/<int:uploaded_file_id>/', views.add_comment, name='add_comment'),
-    # path('reply_comment/<int:uploaded_file_id>/<int:parent_id>/', views.reply_comment, name='reply_comment'),
-
-    # path('view_pdf/<int:file_id>/', views.view_pdf, name='view_pdf'),
-    # path('view_pdf/<int:file_id>/', views.ViewPdf.as_view(), name='view_pdf'),
 ]

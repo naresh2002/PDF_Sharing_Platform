@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import check_password
 from .forms import SignUpForm, LoginForm, UploadedFileForm, CommentForm
 from .models import User, File, Comment
 from django.contrib.auth import logout as django_logout
@@ -17,7 +17,6 @@ def login(request):
                 user = User.objects.get(username=username)
                 if check_password(password, user.password):
                     # Login successful, we can implement session management here
-                    request.session['user_id'] = user.id
                     request.session['user_name'] = user.username
                     request.session.save()
                     return redirect('all_files')
@@ -37,7 +36,7 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()  # Save method handles the password hashing
+            form.save()
             return redirect('login')
     else:
         form = SignUpForm()
@@ -53,7 +52,7 @@ def logout(request):
 # ALL FILES
 def all_files(request):
     if request.session.get('user_name') :
-        pdf_files = File.objects.filter(file__icontains='.pdf')
+        pdf_files = File.objects.filter(name__icontains='.pdf')
         form = CommentForm()
         user_name = request.session.get('user_name')
         return render(request, 'all_files.html', {'pdf_files': pdf_files, 'form' : form, 'user_name': user_name})
@@ -67,7 +66,7 @@ def upload_file(request):
             form = UploadedFileForm(request.POST, request.FILES)
             if form.is_valid():
                 uploaded_file = form.save(commit=False)
-                uploaded_file.uploaded_by = request.session.get('user_name')
+                uploaded_file.owner = request.session.get('user_name')
                 uploaded_file.save()
                 return redirect('file_uploaded')
         else:
@@ -86,8 +85,9 @@ def add_comment(request, file_id):
         form = CommentForm(request.POST)
         if form.is_valid():
             user_name = request.session.get('user_name')
-            text = form.cleaned_data['text']
-            Comment.objects.create(user_name=user_name, uploaded_file_id=file_id, text=text)
+            comment_text = form.cleaned_data['comment_text']
+            file = File.objects.get(id=file_id)
+            Comment.objects.create(user=user_name, file_id=file, comment_text=comment_text)
             return redirect('all_files')
     else:
         form = CommentForm()
@@ -99,8 +99,10 @@ def add_reply(request, file_id, parent_id):
         form = CommentForm(request.POST)
         if form.is_valid():
             user_name = request.session.get('user_name')
-            text = form.cleaned_data['text']
-            Comment.objects.create(user_name=user_name, uploaded_file_id=file_id, parent_id=parent_id, text=text)
+            comment_text = form.cleaned_data['comment_text']
+            file = File.objects.get(id=file_id)
+            parent_comment = Comment.objects.get(id=parent_id)
+            Comment.objects.create(user=user_name, file_id=file, parent_comment_id=parent_comment, comment_text=comment_text)
             return redirect('all_files')
     else:
         form = CommentForm()

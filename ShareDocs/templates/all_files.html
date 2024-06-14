@@ -1,0 +1,112 @@
+<!-- all_files.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uploaded PDF Files</title>
+    <style>
+        .file-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .file-container h3 {
+            margin: 0;
+        }
+        .comments-section {
+            display: none;
+            margin-top: 10px;
+        }
+        .show {
+            display: block !important;
+        }
+        .action-buttons {
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .action-buttons button:hover {
+            background-color: #0056b3;
+        }
+        .toggle-comments-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        .toggle-comments-btn.collapsed {
+            background-color: #6c757d;
+        }
+        .topright {
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topright">
+        <div>Logged in as <b>{{user_name}}</b></div>
+        <button id="logout-btn">Logout</button>
+    </div>
+    <h2>Uploaded PDF Files</h2>
+    {% for file in pdf_files %}
+        <div class="file-container">
+            <h3>{{ file.name.name }}</h3>
+            <a href="{{ file.name.url }}" target="_blank">Open PDF</a>
+            <button class="toggle-comments-btn" data-file-id="{{ file.id }}">Toggle Comments</button>
+            <div class="comments-section" id="comments{{ file.id }}">
+                <h4>Comments</h4>
+                <div class="comments-list">
+                    {% include 'comments.html' with comments=file.comments.all %}
+                </div>
+                <form class="comment-form" action="{% url 'add_comment' file.id %}" method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit">Add Comment</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="action-buttons">
+        <button id="upload-btn">Upload File</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle comments
+            document.querySelectorAll('.toggle-comments-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var fileId = this.getAttribute('data-file-id');
+                    var commentsSection = document.getElementById('comments' + fileId);
+                    commentsSection.classList.toggle('show');
+                    this.classList.toggle('collapsed');
+                });
+            });
+
+            // Redirect to upload page
+            document.getElementById('upload-btn').addEventListener('click', function() {
+                window.location.href = "{% url 'upload_file' %}";
+            });
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                window.location.href = "{% url 'logout' %}";
+            });
+        });
+    </script>
+</body>
+</html>
